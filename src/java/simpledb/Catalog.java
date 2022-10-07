@@ -5,7 +5,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.HashMap;
 
 /**
  * The Catalog keeps track of all available tables in the database and their
@@ -18,57 +18,32 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class Catalog {
 
-    /* @NOTE
-    * In another write-up, I saw someone using a non-static catalogItem
-    * It is a class that contains the table name, the table's schema, and the table's file
-    * Excellent for abstraction
-    */
-    public class catalogItem {
-        String tableName;
-        DbFile tableFile;
-        String tablePKey;
-
-        public catalogItem(String tableName, DbFile tableFile, String tablePKey) {
-            this.tableName = tableName;
-            this.tableFile = tableFile;
-            this.tablePKey = tablePKey;
-        }
-
-        public String getTableName() {
-            return tableName;
-        }
-
-        public DbFile getTableFile() {
-            return tableFile;
-        }
-
-        public String getTablePKey() {
-            return tablePKey;
-        }
-    }
-
     /**
      * Constructor.
      * Creates a new, empty catalog.
      */
+    private HashMap<Integer, catalogItem> idToItemMap;
+    private HashMap<String, Integer> nameIDMap;
+
     public Catalog() {
-        idToItemMap = new ConcurrentHashMap<Integer,CatalogItem>(); // Creates a new ConcurrentHashMap to store the catalogItems
-        nameToIDMap = new ConcurrentHashMap<String, Integer>(); // Creates a new ConcurrentHashMap to store the table names and their IDs
+        idToItemMap = new HashMap<Integer, catalogItem>(); // Creates a new HashMap to store the catalogItems
+        nameIDMap = new HashMap<String, Integer>(); // Creates a new HashMap to store the table names and their IDs
     }
 
     /**
      * Add a new table to the catalog.
      * This table's contents are stored in the specified DbFile.
-     * @param file the contents of the table to add;  file.getId() is the identfier of
-     *    this file/tupledesc param for the calls getTupleDesc and getFile
-     * @param name the name of the table -- may be an empty string.  May not be null.  If a name
-     * conflict exists, use the last table to be added as the table for a given name.
+     *
+     * @param file      the contents of the table to add;  file.getId() is the identfier of
+     *                  this file/tupledesc param for the calls getTupleDesc and getFile
+     * @param name      the name of the table -- may be an empty string.  May not be null.  If a name
+     *                  conflict exists, use the last table to be added as the table for a given name.
      * @param pkeyField the name of the primary key field
      */
     public void addTable(DbFile file, String name, String pkeyField) {
-        CatalogItem newItem = new CatalogItem(name, file, pkeyField); // Creates a new catalogItem
+        catalogItem newItem = new catalogItem(name, file, pkeyField); // Creates a new catalogItem
         idToItemMap.put(file.getId(), newItem); // Adds the catalogItem to the idToItemMap
-        nameToIDMap.put(name, file.getId()); // Adds the table name and its ID to the nameToIDMap
+        nameIDMap.put(name, file.getId()); // Adds the table name and its ID to the nameIDMap
     }
 
     public void addTable(DbFile file, String name) {
@@ -79,8 +54,9 @@ public class Catalog {
      * Add a new table to the catalog.
      * This table has tuples formatted using the specified TupleDesc and its
      * contents are stored in the specified DbFile.
+     *
      * @param file the contents of the table to add;  file.getId() is the identfier of
-     *    this file/tupledesc param for the calls getTupleDesc and getFile
+     *             this file/tupledesc param for the calls getTupleDesc and getFile
      */
     public void addTable(DbFile file) {
         addTable(file, (UUID.randomUUID()).toString());
@@ -88,24 +64,28 @@ public class Catalog {
 
     /**
      * Return the id of the table with a specified name,
+     *
      * @throws NoSuchElementException if the table doesn't exist
      */
     public int getTableId(String name) throws NoSuchElementException {
-        // some code goes here
-        return 0;
+        if (nameIDMap.containsKey(name)) { // Checks if the nameIDMap contains the name
+            return nameIDMap.get(name); // Returns the ID of the table
+        } else {
+            throw new NoSuchElementException("Table does not exist"); // Throws an exception if the table does not exist
+        }
     }
 
     /**
      * Returns the tuple descriptor (schema) of the specified table
+     *
      * @param tableid The id of the table, as specified by the DbFile.getId()
-     *     function passed to addTable
+     *                function passed to addTable
      * @throws NoSuchElementException if the table doesn't exist
      */
     public TupleDesc getTupleDesc(int tableid) throws NoSuchElementException {
-        if(idToItemMap.containsKey(tableid)) {
+        if (idToItemMap.containsKey(tableid)) {
             return idToItemMap.get(tableid).getTableFile().getTupleDesc();
-        }
-        else {
+        } else {
             throw new NoSuchElementException("Table does not exist");
         }
     }
@@ -113,41 +93,54 @@ public class Catalog {
     /**
      * Returns the DbFile that can be used to read the contents of the
      * specified table.
+     *
      * @param tableid The id of the table, as specified by the DbFile.getId()
-     *     function passed to addTable
+     *                function passed to addTable
      */
     public DbFile getDatabaseFile(int tableid) throws NoSuchElementException {
-        // some code goes here
-        return null;
+        if (idToItemMap.containsKey(tableid)) {
+            return idToItemMap.get(tableid).getTableFile();
+        } else {
+            throw new NoSuchElementException("Table does not exist");
+        }
     }
 
     public String getPrimaryKey(int tableid) {
-        // some code goes here
-        return null;
+        if (idToItemMap.containsKey(tableid)) {
+            return idToItemMap.get(tableid).getTablePKey();
+        } else {
+            throw new NoSuchElementException("Table does not exist");
+        }
     }
 
     public Iterator<Integer> tableIdIterator() {
-        // some code goes here
-        return null;
+        return idToItemMap.keySet().iterator();
     }
 
     public String getTableName(int id) {
-        // some code goes here
-        return null;
+        if (idToItemMap.containsKey(id)) {
+            return idToItemMap.get(id).getTableName();
+        } else {
+            throw new NoSuchElementException("Table does not exist");
+        }
     }
 
-    /** Delete all tables from the catalog */
+    /**
+     * Delete all tables from the catalog
+     */
     public void clear() {
-        // some code goes here
+        idToItemMap.clear();
+        nameIDMap.clear();
     }
 
     /**
      * Reads the schema from a file and creates the appropriate tables in the database.
+     *
      * @param catalogFile
      */
     public void loadSchema(String catalogFile) {
         String line = "";
-        String baseFolder=new File(new File(catalogFile).getAbsolutePath()).getParent();
+        String baseFolder = new File(new File(catalogFile).getAbsolutePath()).getParent();
         try {
             BufferedReader br = new BufferedReader(new FileReader(new File(catalogFile)));
 
@@ -183,16 +176,45 @@ public class Catalog {
                 Type[] typeAr = types.toArray(new Type[0]);
                 String[] namesAr = names.toArray(new String[0]);
                 TupleDesc t = new TupleDesc(typeAr, namesAr);
-                HeapFile tabHf = new HeapFile(new File(baseFolder+"/"+name + ".dat"), t);
-                addTable(tabHf,name,primaryKey);
+                HeapFile tabHf = new HeapFile(new File(baseFolder + "/" + name + ".dat"), t);
+                addTable(tabHf, name, primaryKey);
                 System.out.println("Added table : " + name + " with schema " + t);
             }
         } catch (IOException e) {
             e.printStackTrace();
             System.exit(0);
         } catch (IndexOutOfBoundsException e) {
-            System.out.println ("Invalid catalog entry : " + line);
+            System.out.println("Invalid catalog entry : " + line);
             System.exit(0);
+        }
+    }
+
+    /* @NOTE
+     * In another write-up, I saw someone using a non-static catalogItem
+     * It is a class that contains the table name, the table's schema, and the table's file
+     * Excellent for abstraction
+     */
+    private class catalogItem {
+        String tableName;
+        DbFile tableFile;
+        String tablePKey;
+
+        public catalogItem(String tableName, DbFile tableFile, String tablePKey) {
+            this.tableName = tableName;
+            this.tableFile = tableFile;
+            this.tablePKey = tablePKey;
+        }
+
+        public String getTableName() {
+            return tableName;
+        }
+
+        public DbFile getTableFile() {
+            return tableFile;
+        }
+
+        public String getTablePKey() {
+            return tablePKey;
         }
     }
 }
