@@ -3,6 +3,11 @@ package simpledb;
 import java.io.Serializable;
 import java.util.*;
 
+/*
+* @author: Abhinav
+* class: cs655 at BU GRS
+ */
+
 /**
  * Tuple maintains information about the contents of a tuple. Tuples have a
  * specified schema specified by a TupleDesc object and contain Field objects
