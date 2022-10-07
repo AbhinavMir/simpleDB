@@ -58,7 +58,6 @@ simpledb.TransactionAbortedException
 simpledb.Tuple
 java.util.List
 simpledb.Field
-java.util.Iterator
 java.lang.Object
 java.lang.StringBuilder
 simpledb.TupleDesc
@@ -381,8 +380,11 @@ simpledb.CatalogTest
 org.junit.Assert
 java.util.NoSuchElementException
 ||:simpledb.TupleDesc
+java.lang.IndexOutOfBoundsException
 java.lang.UnsupportedOperationException
+java.lang.invoke.MethodHandles$Lookup
 java.util.Iterator
+java.lang.invoke.MethodHandles
 [Lsimpledb.Type;
 [Ljava.lang.String;
 java.util.ArrayList
@@ -390,7 +392,8 @@ java.io.Serializable
 java.util.List
 simpledb.Type
 java.lang.Object
-java.lang.String
+java.lang.StringBuilder
+java.lang.invoke.StringConcatFactory
 simpledb.TupleDesc
 java.util.NoSuchElementException
 simpledb.TupleDesc$TDItem

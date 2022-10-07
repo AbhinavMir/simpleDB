@@ -18,12 +18,42 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class Catalog {
 
+    /* @NOTE
+    * In another write-up, I saw someone using a non-static catalogItem
+    * It is a class that contains the table name, the table's schema, and the table's file
+    * Excellent for abstraction
+    */
+    public class catalogItem {
+        String tableName;
+        DbFile tableFile;
+        String tablePKey;
+
+        public catalogItem(String tableName, DbFile tableFile, String tablePKey) {
+            this.tableName = tableName;
+            this.tableFile = tableFile;
+            this.tablePKey = tablePKey;
+        }
+
+        public String getTableName() {
+            return tableName;
+        }
+
+        public DbFile getTableFile() {
+            return tableFile;
+        }
+
+        public String getTablePKey() {
+            return tablePKey;
+        }
+    }
+
     /**
      * Constructor.
      * Creates a new, empty catalog.
      */
     public Catalog() {
-        // some code goes here
+        idToItemMap = new ConcurrentHashMap<Integer,CatalogItem>(); // Creates a new ConcurrentHashMap to store the catalogItems
+        nameToIDMap = new ConcurrentHashMap<String, Integer>(); // Creates a new ConcurrentHashMap to store the table names and their IDs
     }
 
     /**
@@ -36,7 +66,9 @@ public class Catalog {
      * @param pkeyField the name of the primary key field
      */
     public void addTable(DbFile file, String name, String pkeyField) {
-        // some code goes here
+        CatalogItem newItem = new CatalogItem(name, file, pkeyField); // Creates a new catalogItem
+        idToItemMap.put(file.getId(), newItem); // Adds the catalogItem to the idToItemMap
+        nameToIDMap.put(name, file.getId()); // Adds the table name and its ID to the nameToIDMap
     }
 
     public void addTable(DbFile file, String name) {
@@ -70,8 +102,12 @@ public class Catalog {
      * @throws NoSuchElementException if the table doesn't exist
      */
     public TupleDesc getTupleDesc(int tableid) throws NoSuchElementException {
-        // some code goes here
-        return null;
+        if(idToItemMap.containsKey(tableid)) {
+            return idToItemMap.get(tableid).getTableFile().getTupleDesc();
+        }
+        else {
+            throw new NoSuchElementException("Table does not exist");
+        }
     }
 
     /**

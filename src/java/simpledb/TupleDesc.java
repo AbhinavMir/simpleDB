@@ -85,12 +85,12 @@ public class TupleDesc implements Serializable {
      */
     public String getFieldName(int i) throws NoSuchElementException {
         try {
-            return fieldArr.get(i).fieldName; // Returns the field name of the ith field}
-        catch(IndexOutOfBoundsException e)
-            { // If i is not a valid field reference
-                throw new NoSuchElementException("Invalid field reference");
-            }
+            return fieldArr.get(i).fieldName; // Returns the field name of the ith field
+        } catch (
+                IndexOutOfBoundsException e) { // If i is not a valid field reference
+            throw new NoSuchElementException("Invalid field reference");
         }
+
     }
 
     /**
@@ -137,31 +137,29 @@ public class TupleDesc implements Serializable {
      * @return true if the object is equal to this TupleDesc.
      */
     public boolean equals(Object o) {
-        TupleDesc td = (TupleDesc) o; // Typecasts the object to a TupleDesc
-        if (o != null) {
-            if (o.getClass() == this.getClass()) { // If the object is not of the same class as this TupleDesc
-                // If the object is of the same size as this TupleDesc
-                if (td.fieldArr.size() == this.fieldArr.size()) {
-                    for (int i = 0; i < td.fieldArr.size(); i++) {
-                        if (td.fieldArr.get(i).fieldType == this.fieldArr.get(i).fieldType) {
-                            return true; // If the contents are not the same, return false
-                        } else {
-                            return false; // Contents are not the same
-                        }
-                    } else{
-                        return false; // If the contents are not the same, return false
+        // check that the object is TupleDesc
+        // Check that the object is of same size
+        // check that the n-th type in this TupleDesc is equal to the n-th type in o
+        if (o instanceof TupleDesc) {
+            TupleDesc td = (TupleDesc) o;
+            if (td.getSize() == this.getSize()) {
+                for (int i = 0; i < this.numFields(); i++) {
+                    if (this.getFieldType(i) != td.getFieldType(i)) {
+                        return false;
                     }
-                } else {
-                    return false; // If the sizes are not the same, return false
                 }
+                return true;
+            } else {
+                return false;
             }
         } else {
-            return false; // If the object is null, return false
+            return false;
         }
     }
 
+    @Override
     public int hashCode() {
-        return fieldList.hashCode();
+        throw new UnsupportedOperationException("unimplemented");
     }
 
     /**
