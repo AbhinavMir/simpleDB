@@ -314,6 +314,5 @@ public class HeapPage implements Page {
             if (isSlotUsed(i)) tupleList.add(tuples[i]);
         return tupleList.iterator();
     }
-
 }
 

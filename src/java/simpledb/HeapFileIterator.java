@@ -16,12 +16,13 @@ public class HeapFileIterator implements DbFileIterator {
     HeapPageId pid;
     HeapFile hf;
 
+    // HeapFileIterator(tid, this);
     public HeapFileIterator(TransactionId tid, HeapFile hf) {
         this.tid = tid;
-        this.hf = hf;
+        this.pageCounter = 0;
         this.tableId = hf.getId();
         this.numPages = hf.numPages();
-        this.pageCounter = 0;
+        this.hf = hf;
     }
 
     private Iterator<Tuple> getTuples(int pageNumber) throws DbException, TransactionAbortedException {
