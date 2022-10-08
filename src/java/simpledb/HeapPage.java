@@ -12,11 +12,11 @@ import java.io.*;
  */
 public class HeapPage implements Page {
 
-    final HeapPageId pid;
-    final TupleDesc td;
-    final byte header[];
-    final Tuple tuples[];
-    final int numSlots;
+    private HeapPageId pid;
+    private TupleDesc td;
+    private byte header[];
+    private Tuple tuples[];
+    private int numSlots;
     private final Byte oldDataLock = new Byte((byte) 0);
     byte[] oldData;
 
@@ -48,9 +48,9 @@ public class HeapPage implements Page {
         for (int i = 0; i < header.length; i++)
             header[i] = dis.readByte();
 
-        tuples = new Tuple[numSlots];
         try {
             // allocate and read the actual records of this page
+            tuples = new Tuple[numSlots];
             for (int i = 0; i < tuples.length; i++)
                 tuples[i] = readNextTuple(dis, i);
         } catch (NoSuchElementException e) {

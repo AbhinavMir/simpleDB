@@ -63,9 +63,7 @@ public class HeapPageId implements PageId {
 
         if (heapPageId.pageNo != this.pageNo) {
             return false;
-        }
-
-        else {
+        } else {
             return true;
         }
     }

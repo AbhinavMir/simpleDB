@@ -26,10 +26,10 @@ public class BufferPool {
     /**
      * Bytes per page, including header.
      */
-    private static final int PAGE_SIZE = 4096;
-    private static int pageSize = PAGE_SIZE;
-    private int numPages;
-    private HashMap<TransactionId, Set<PageId>> pageTransactions;
+    public static final int PAGE_SIZE = 4096;
+    public static int pageSize = PAGE_SIZE;
+    public int numPages;
+    public HashMap<TransactionId, Set<PageId>> pageTransactions;
 
     /**
      * Creates a BufferPool that caches up to numPages pages.

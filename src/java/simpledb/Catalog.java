@@ -71,7 +71,7 @@ public class Catalog {
         if (nameIDMap.containsKey(name)) { // Checks if the nameIDMap contains the name
             return nameIDMap.get(name); // Returns the ID of the table
         } else {
-            throw new NoSuchElementException("Table does not exist"); // Throws an exception if the table does not exist
+            throw new NoSuchElementException("No table with name: " + name); // Throws an exception if the table does not exist
         }
     }
 

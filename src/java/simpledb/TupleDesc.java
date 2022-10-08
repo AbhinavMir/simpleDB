@@ -62,7 +62,7 @@ public class TupleDesc implements Serializable {
     }
 
     /**
-     * @return An iterator which iterates over all the field TDItems
+     * @return An iterator which iterates over all the field fieldArr
      * that are included in this TupleDesc
      */
     public Iterator<TDItem> iterator() {
@@ -113,7 +113,12 @@ public class TupleDesc implements Serializable {
      * @throws NoSuchElementException if no field with a matching name is found.
      */
     public int fieldNameToIndex(String name) throws NoSuchElementException {
-        return fieldArr.indexOf(name); // Returns the index of the field with the given name
+        for (int i = 0; i < fieldArr.size(); i++) {
+            if ((fieldArr.get(i).fieldName != null) && (fieldArr.get(i).fieldName).equals(name)) {
+                return i;
+            }
+        }
+        throw new NoSuchElementException("No such field");
     }
 
     /**
