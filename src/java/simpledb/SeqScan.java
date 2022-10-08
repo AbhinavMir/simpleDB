@@ -10,67 +10,70 @@ import java.util.*;
 public class SeqScan implements DbIterator {
 
     private static final long serialVersionUID = 1L;
+    private TransactionId tid;
+    private int tableId;
+    private String tableAlias;
+    private DbFileIterator iterator;
 
     /**
      * Creates a sequential scan over the specified table as a part of the
      * specified transaction.
      *
-     * @param tid
-     *            The transaction this scan is running as a part of.
-     * @param tableid
-     *            the table to scan.
-     * @param tableAlias
-     *            the alias of this table (needed by the parser); the returned
-     *            tupleDesc should have fields with name tableAlias.fieldName
-     *            (note: this class is not responsible for handling a case where
-     *            tableAlias or fieldName are null. It shouldn't crash if they
-     *            are, but the resulting name can be null.fieldName,
-     *            tableAlias.null, or null.null).
+     * @param tid        The transaction this scan is running as a part of.
+     * @param tableid    the table to scan.
+     * @param tableAlias the alias of this table (needed by the parser); the returned
+     *                   tupleDesc should have fields with name tableAlias.fieldName
+     *                   (note: this class is not responsible for handling a case where
+     *                   tableAlias or fieldName are null. It shouldn't crash if they
+     *                   are, but the resulting name can be null.fieldName,
+     *                   tableAlias.null, or null.null).
      */
     public SeqScan(TransactionId tid, int tableid, String tableAlias) {
-        // some code goes here
-    }
-
-    /**
-     * @return
-     *       return the table name of the table the operator scans. This should
-     *       be the actual name of the table in the catalog of the database
-     * */
-    public String getTableName() {
-        return null;
-    }
-
-    /**
-     * @return Return the alias of the table this operator scans.
-     * */
-    public String getAlias()
-    {
-        // some code goes here
-        return null;
-    }
-
-    /**
-     * Reset the tableid, and tableAlias of this operator.
-     * @param tableid
-     *            the table to scan.
-     * @param tableAlias
-     *            the alias of this table (needed by the parser); the returned
-     *            tupleDesc should have fields with name tableAlias.fieldName
-     *            (note: this class is not responsible for handling a case where
-     *            tableAlias or fieldName are null. It shouldn't crash if they
-     *            are, but the resulting name can be null.fieldName,
-     *            tableAlias.null, or null.null).
-     */
-    public void reset(int tableid, String tableAlias) {
-        // some code goes here
+        this.tid = tid;
+        this.tableId = tableid;
+        this.tableAlias = tableAlias;
+        this.iterator = Database.getCatalog().getDatabaseFile(tableid).iterator(tid);
     }
 
     public SeqScan(TransactionId tid, int tableid) {
         this(tid, tableid, Database.getCatalog().getTableName(tableid));
     }
 
+    /**
+     * @return return the table name of the table the operator scans. This should
+     * be the actual name of the table in the catalog of the database
+     */
+    public String getTableName() {
+
+        return Database.getCatalog().getTableName(tableId);
+    }
+
+    /**
+     * @return Return the alias of the table this operator scans.
+     */
+    public String getAlias() {
+        if (tableAlias == null) return null;
+        return tableAlias;
+    }
+
+    /**
+     * Reset the tableid, and tableAlias of this operator.
+     *
+     * @param tableid    the table to scan.
+     * @param tableAlias the alias of this table (needed by the parser); the returned
+     *                   tupleDesc should have fields with name tableAlias.fieldName
+     *                   (note: this class is not responsible for handling a case where
+     *                   tableAlias or fieldName are null. It shouldn't crash if they
+     *                   are, but the resulting name can be null.fieldName,
+     *                   tableAlias.null, or null.null).
+     */
+    public void reset(int tableid, String tableAlias) {
+        this.tableId = tableid;
+        this.tableAlias = tableAlias;
+    }
+
     public void open() throws DbException, TransactionAbortedException {
-        // some code goes here
+        iterator.open();
     }
 
     /**
@@ -81,30 +84,33 @@ public class SeqScan implements DbIterator {
      * (e.g., "alias.fieldName").
      *
      * @return the TupleDesc with field names from the underlying HeapFile,
-     *         prefixed with the tableAlias string from the constructor.
+     * prefixed with the tableAlias string from the constructor.
      */
     public TupleDesc getTupleDesc() {
-        // some code goes here
-        return null;
+        TupleDesc td = Database.getCatalog().getTupleDesc(tableId);
+        int numFields = td.numFields();
+        Type[] typeAr = new Type[numFields];
+        String[] fieldAr = new String[numFields];
+        for (int i = 0; i < numFields; i++) {
+            typeAr[i] = td.getFieldType(i);
+            fieldAr[i] = tableAlias + "." + td.getFieldName(i);
+        }
+        return new TupleDesc(typeAr, fieldAr);
     }
 
     public boolean hasNext() throws TransactionAbortedException, DbException {
-        // some code goes here
-        return false;
+        return iterator.hasNext();
     }
 
-    public Tuple next() throws NoSuchElementException,
-            TransactionAbortedException, DbException {
-        // some code goes here
-        return null;
+    public Tuple next() throws NoSuchElementException, TransactionAbortedException, DbException {
+        return iterator.next();
     }
 
     public void close() {
-        // some code goes here
+        iterator.close();
     }
 
-    public void rewind() throws DbException, NoSuchElementException,
-            TransactionAbortedException {
-        // some code goes here
+    public void rewind() throws DbException, NoSuchElementException, TransactionAbortedException {
+        iterator.rewind();
     }
 }

@@ -65,7 +65,7 @@
       <workItem from="1664683286136" duration="57000" />
       <workItem from="1664683350667" duration="3723000" />
       <workItem from="1664772115248" duration="2691000" />
-      <workItem from="1665162238180" duration="18199000" />
+      <workItem from="1665162238180" duration="22420000" />
     </task>
     <servers />
   </component>
@@ -82,6 +82,21 @@
         </entry>
       </map>
     </option>
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="java-method">
+          <url>file://$PROJECT_DIR$/test/simpledb/HeapFileReadTest.java</url>
+          <line>80</line>
+          <properties class="simpledb.HeapFileReadTest" method="testIteratorBasic">
+            <option name="EMULATED" value="true" />
+            <option name="WATCH_EXIT" value="false" />
+          </properties>
+          <option name="timeStamp" value="1" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
